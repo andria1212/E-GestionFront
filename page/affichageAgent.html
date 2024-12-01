@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Agents</title>
+   <link rel="stylesheet" href="../style/affichageAgent.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Liste des Agents</h1>
+        <table id="agentsTable">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Date de Naissance</th>
+                    <th>email</th>
+                    <th>situation marital</th>
+                    <th>Ville</th>
+                    <th>contact</th>
+                    <th>Direction</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody id="agentsBody">
+                <tr>
+                    <td colspan="8">Chargement des données...</td>
+                </tr>
+            </tbody>
+        </table>
+        <p id="errorMessage" class="error-message" style="display: none;">Erreur de chargement des données.</p>
+    </div>
+
+    <script>
+        // URL de l'API
+        const apiUrl = 'http://localhost:8080/agent/';
+
+        // Fonction pour récupérer les données
+        async function fetchAgents() {
+            try {
+                const response = await fetch(apiUrl);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    renderAgents(result.data);
+                } else {
+                    showError('Erreur lors de la récupération des données.');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showError('Erreur de connexion avec le serveur.');
+            }
+        }
+
+        // Fonction pour afficher les données dans le tableau
+        function renderAgents(agents) {
+            const tbody = document.getElementById('agentsBody');
+            tbody.innerHTML = '';
+
+            if (agents.length > 0) {
+                agents.forEach(agent => {
+                    const row = `
+                        <tr>
+                            <td>${agent.nom_agent}</td>
+                            <td>${agent.prenom_agent}</td>
+                            <td>${agent.date_naissance}</td>
+                            <td>${agent.email}</td>
+                            <td>${agent.situation_marital}</td>
+                            <td>${agent.ville}</td>
+                            <td>${agent.contact}</td>
+                            <td>${agent.nomDirection}</td>
+                            <td>${agent.grade}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8">Aucun agent trouvé.</td></tr>';
+            }
+        }
+
+        // Fonction pour afficher un message d'erreur
+        function showError(message) {
+            document.getElementById('agentsBody').innerHTML = '';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        // Charger les données au chargement de la page
+        document.addEventListener('DOMContentLoaded', fetchAgents);
+    </script>
+</body>
+</html>

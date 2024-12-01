@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajout d'un Agent</title>
+    <link rel="stylesheet" href="../style/ajoutAg.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Ajouter un Agent</h1>
+        <form id="addAgentForm">
+            <div>
+                <label for="nom_agent">Nom :</label>
+                <input type="text" id="nom_agent" name="nom_agent" required>
+            </div>
+            <div>
+                <label for="prenom_agent">Prénom :</label>
+                <input type="text" id="prenom_agent" name="prenom_agent" required>
+            </div>
+            <div>
+                <label for="date_naissance">Date de Naissance :</label>
+                <input type="date" id="date_naissance" name="date_naissance" required>
+            </div>
+            <div>
+                <label for="email">Email :</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="situation_marital">Situation maritale :</label>
+                <select id="situation_marital" name="situation_marital" required>
+                    <option value="Marié">Marié</option>
+                    <option value="Divorcer">Divorcer</option>
+                    <option value="Séparé">Séparé</option>
+                    <option value="Veuf/Veuve">Veuf/Veuve</option>
+                    <option value="Union libre">Union libre</option>
+                </select>
+            </div>
+            <div>
+                <label for="id_loc">Ville (ID) :</label>
+                <input type="number" id="id_loc" name="id_loc" required>
+            </div>
+            <div>
+                <label for="id_corps">Corps (ID) :</label>
+                <input type="number" id="id_corps" name="id_corps" required>
+            </div>
+            <div>
+                <label for="id_direc">Direction (ID) :</label>
+                <input type="number" id="id_direc" name="id_direc" required>
+            </div>
+            <div>
+                <label for="contact">Contact :</label>
+                <input type="tel" id="contact" name="contact" required pattern="[0-9]{10}">
+            </div>
+            <div>
+                <label for="grade">Grade :</label>
+                <select id="grade" name="grade" required>
+                    <option value="2C1E">2C1E</option>
+                    <option value="2C@E">2C@E</option>
+                    <option value="2C3E">2C3E</option>
+                    <option value="1C1E">1C1E</option>
+                </select>
+            </div>
+            <button type="submit">Ajouter Agent</button>
+        </form>
+
+        <p id="successMessage" class="success-message" style="display: none;">Agent ajouté avec succès !</p>
+        <p id="errorMessage" class="error-message" style="display: none;">Erreur lors de l'ajout de l'agent.</p>
+    </div>
+
+    <script>
+        const apiUrl = 'http://localhost:8080/agent/';
+
+        document.getElementById('addAgentForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+
+            const formatDate = (date) => {
+                const [year, month, day] = date.split('-');
+                return `${day}-${month}-${year}`;
+            };
+
+            const formData = {
+                nom_agent: document.getElementById('nom_agent').value,
+                prenom_agent: document.getElementById('prenom_agent').value,
+                date_naissance: formatDate(document.getElementById('date_naissance').value),
+                email: document.getElementById('email').value,
+                id_loc: parseInt(document.getElementById('id_loc').value, 10),
+                id_corps: parseInt(document.getElementById('id_corps').value, 10),
+                id_direc: parseInt(document.getElementById('id_direc').value, 10),
+                situation_marital: document.getElementById('situation_marital').value,
+                contact: document.getElementById('contact').value,
+                grade: document.getElementById('grade').value
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                    document.getElementById('addAgentForm').reset();
+                } else {
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('successMessage').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
